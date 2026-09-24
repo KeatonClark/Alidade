@@ -1,16 +1,21 @@
 {
   stdenvNoCC,
-  kibotPackages,
   python3Packages,
+  ocamlPackages,
+  freecad,
 }:
 stdenvNoCC.mkDerivation {
   name = "alidade-hw";
   src = ./.;
   buildInputs = [
-    python3Packages.kicad
-    kibotPackages.kibot
-    kibotPackages.kidiff
-  ];
+    ocamlPackages.sexp
+    freecad
+  ] ++ (with python3Packages; [
+    kicad
+    click
+    sexpdata
+    ezdxf
+  ]);
   preBuild = ''
     export HOME=$(mktemp -d)
   '';

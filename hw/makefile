@@ -1,18 +1,106 @@
 .PHONY: clean all install
 
 PROJECT ?= $(basename $(firstword $(wildcard *.kicad_pro)))
+PROJECT_ROOT ?= $(CURDIR)
+BUILD_SCRIPTS ?= $(PROJECT_ROOT)/scripts
+BUILD_DIR ?= $(PROJECT_ROOT)/build
 ifeq ($(PROJECT),)
 	$(error No .kicad_pro file found. Set PROJECT=<name> explicitly)
 endif
 
-KICAD_SCH ?= $(PROJECT).kicad_sch
-KICAD_PCB ?= $(PROJECT).kicad_pcb
-CONFIG ?= $(PROJECT).kibot.yaml
-LICENSE ?= LICENSE-CC-BY-SA
+KICAD_SCH ?= $(PROJECT_ROOT)/$(PROJECT).kicad_sch
+KICAD_PCB ?= $(PROJECT_ROOT)/$(PROJECT).kicad_pcb
+LICENSE	  ?= $(PROJECT_ROOT)/LICENSE-CC-BY-SA
 
-OUT_DIR ?= build
-DATASHEET_DIR ?= lib/datasheets
+$(info KiCad Schematic: $(KICAD_SCH))
+$(info KiCad PCB:       $(KICAD_PCB))
+$(info Project License: $(LICENSE))
 
+ERC                 := $(BUILD_DIR)/erc.json
+BOM                 := $(BUILD_DIR)/bom.csv
+DRC                 := $(BUILD_DIR)/drc.json
+STATS               := $(BUILD_DIR)/stats.json
+SCH_PDF             := $(BUILD_DIR)/schematic.pdf
+STEP                := $(BUILD_DIR)/alidade.step
+CUTTER_LEFT         := $(BUILD_DIR)/cutter_left.dxf
+CUTTER_RIGHT        := $(BUILD_DIR)/cutter_right.dxf
+
+OUTPUTS := \
+	$(ERC) \
+	$(BOM) \
+	$(DRC) \
+	$(STATS) \
+	$(PDF) \
+	$(STEP) \
+	$(CUTTER_RIGHT) \
+	$(CUTTER_LEFT) \
+
+all: $(OUTPUTS)
+
+###########
+# SCH_PDF #
+###########
+SCH_PDF_FLAGS ?=
+$(SCH_PDF): $(KICAD_SCH)
+	@mkdir -p $(dir $@)
+	@kicad-cli sch export pdf -o $@ $(PDF_FLAGS) $<
+
+#######
+# ERC #
+#######
+ERC_FLAGS ?= --format json
+$(ERC): $(KICAD_SCH)
+	@mkdir -p $(dir $@)
+	@kicad-cli sch erc -o $@ $(ERC_FLAGS) $<
+
+#######
+# BOM #
+#######
+BOM_FLAGS ?= --group-by Value
+$(BOM): $(KICAD_SCH)
+	@mkdir -p $(dir $@)
+	@kicad-cli sch export bom -o $@ $(BOM_FLAGS) $<
+
+#######
+# DRC #
+#######
+DRC_FLAGS ?= --format json --schematic-parity
+$(DRC): $(KICAD_PCB)
+	@mkdir -p $(dir $@)
+	@kicad-cli pcb drc -o $@ $(DRC_FLAGS) $<
+
+#########
+# STATS #
+#########
+STATS_FLAGS ?= --format json
+$(STATS): $(KICAD_PCB)
+	@mkdir -p $(dir $@)
+	@kicad-cli pcb export stats -o $@ $(STATS_FLAGS) $<
+
+########
+# STEP #
+########
+STEP_FLAGS ?= --grid-origin --include-tracks --include-pads --include-silkscreen --include-soldermask
+$(STEP): $(KICAD_PCB)
+	@mkdir -p $(dir $@)
+	@kicad-cli pcb export step -o $@ $(STEP_FLAGS) $<
+
+###########
+# CUTTERS #
+###########
+CUTTER_FLAGS ?= 
+CUTTER_SCRIPT = $(BUILD_SCRIPTS)/cookicad_cutter.py
+CUTTER_LEFT_LAYER ?= "Eco1.User"
+CUTTER_RIGHT_LAYER ?= "Eco2.User"
+$(CUTTER_LEFT) $(CUTTER_RIGHT)&: $(KICAD_PCB) $(CUTTER_SCRIPT)
+	@mkdir -p $(dir $@)
+	@$(CUTTER_SCRIPT) gen $< -l $(CUTTER_LEFT_LAYER) $(CUTTER_LEFT)
+	@$(CUTTER_SCRIPT) gen $< -l $(CUTTER_RIGHT_LAYER) $(CUTTER_RIGHT)
+
+
+###########
+# Install #
+###########
 PREFIX ?= /usr/local
 DATAROOTDIR ?= $(PREFIX)/share
 DATADIR ?= $(DATAROOTDIR)/$(PROJECT)
@@ -20,37 +108,13 @@ DESTDIR ?=
 
 INSTALL_DIR := $(DESTDIR)$(DATADIR)
 
-SOURCES := $(shell find . \
-	   \( -name '*.kicad_pro' \
-	   -o -name '*.kicad_sch' \
-	   -o -name '*.kicad_pcb' \
-	   -o -name '*.kicad_sym' \
-	   -o -name '*.kicad_mod' \
-	   -o -name '*.kibot.yaml' \
-	   \) -not -path './.git/*' \
-	   -not -path './$(OUT_DIR)/*' \
-	   2>/dev/null)
-
-STAMP := $(OUT_DIR)/.build_stamp
-
-KIBOT_FLAGS := -e $(KICAD_SCH) -b $(KICAD_PCB) -c $(CONFIG) -d $(OUT_DIR)
-
-all: $(STAMP)
-
-$(STAMP): $(SOURCES)
-	@mkdir -p $(OUT_DIR)
-	kibot $(KIBOT_FLAGS)
-	@touch $@
-
-install: $(STAMP)
-	@echo "Installing to $(INSTALL_DIR)"
+install: $(OUTPUTS) $(LICENSE)
 	@install -d $(INSTALL_DIR)
-	@cd $(OUT_DIR) && find . -type f -exec \
-		install -D -m 0644 {} $(INSTALL_DIR)/{} \;
-	@install -D -m 0644 $(LICENSE) $(INSTALL_DIR)
-	@cd $(DATASHEET_DIR) && find . -type f -exec \
-		install -D -m 0644 {} $(INSTALL_DIR)/datasheets/{} \;
+	@install -D -m 0644 $^ $(INSTALL_DIR)
 
+#########
+# Clean #
+#########
 clean:
-	rm -rf $(OUT_DIR)
-
+	@echo "Cleaning $(BUILD_DIR)"
+	@rm -r $(BUILD_DIR)

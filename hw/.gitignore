@@ -6,3 +6,4 @@ fp-info-cache
 output
 result
 build
+__pycache__
