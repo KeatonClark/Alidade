@@ -19,5 +19,6 @@
     packages.pkgs = pkgs;
     packages.hw = pkgs.callPackage ./hw { };
     packages.docs = pkgs.callPackage ./docs { alidade-hw = self.packages.${system}.hw; };
+    packages.parse-kicad-results = pkgs.callPackage ./nix/parse-kicad-results { };
   });
 }

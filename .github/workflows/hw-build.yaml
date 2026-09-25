@@ -18,10 +18,10 @@ jobs:
         run: nix build .#hw -L
 
       - name: Parse ERC Results
-        run: python3 .github/scripts/parse_erc.py result/share/alidade/erc/alidade-erc.csv
+        run: nix run .#parse-kicad-results -- erc result/share/alidade/erc.json $GITHUB_STEP_SUMMARY
 
-#      - name: Parse DRC Results
-#        run: python3 .github/scripts/parse_drc.py result/share/alidade/drc/alidade-drc.csv
+      - name: Parse DRC Results
+        run: nix run .#parse-kicad-results -- drc result/share/alidade/drc.json $GITHUB_STEP_SUMMARY --no-fatal-errors
 
       - name: Gather Outputs
         run: tar -czf alidade-hw-pkg.tar.gz -C result .
