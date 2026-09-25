@@ -104,6 +104,7 @@ $(CUTTER_LEFT) $(CUTTER_RIGHT) &: $(KICAD_PCB) $(CUTTER_SCRIPT)
 $(STEP_LEFT) $(STEP_RIGHT) &: $(STEP) $(CUTTER_LEFT) $(CUTTER_RIGHT) $(CUTTER_SCRIPT)
 	@mkdir -p $(dir $@)
 	@freecadcmd $(CUTTER_SCRIPT) cut $(STEP) $(CUTTER_LEFT) $(STEP_LEFT) 
+	@freecadcmd $(CUTTER_SCRIPT) cut $(STEP) $(CUTTER_RIGHT) $(STEP_RIGHT) 
 
 
 ###########
