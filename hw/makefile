@@ -24,6 +24,8 @@ SCH_PDF             := $(BUILD_DIR)/schematic.pdf
 STEP                := $(BUILD_DIR)/alidade.step
 CUTTER_LEFT         := $(BUILD_DIR)/cutter_left.dxf
 CUTTER_RIGHT        := $(BUILD_DIR)/cutter_right.dxf
+STEP_LEFT           := $(BUILD_DIR)/alidade_left.step
+STEP_RIGHT          := $(BUILD_DIR)/alidade_right.step
 
 OUTPUTS := \
 	$(ERC) \
@@ -34,6 +36,8 @@ OUTPUTS := \
 	$(STEP) \
 	$(CUTTER_RIGHT) \
 	$(CUTTER_LEFT) \
+	$(STEP_LEFT) \
+	$(STEP_RIGHT) \
 
 all: $(OUTPUTS)
 
@@ -92,10 +96,14 @@ CUTTER_FLAGS ?=
 CUTTER_SCRIPT = $(BUILD_SCRIPTS)/cookicad_cutter.py
 CUTTER_LEFT_LAYER ?= "Eco1.User"
 CUTTER_RIGHT_LAYER ?= "Eco2.User"
-$(CUTTER_LEFT) $(CUTTER_RIGHT)&: $(KICAD_PCB) $(CUTTER_SCRIPT)
+$(CUTTER_LEFT) $(CUTTER_RIGHT) &: $(KICAD_PCB) $(CUTTER_SCRIPT)
 	@mkdir -p $(dir $@)
-	@$(CUTTER_SCRIPT) gen $< -l $(CUTTER_LEFT_LAYER) $(CUTTER_LEFT)
-	@$(CUTTER_SCRIPT) gen $< -l $(CUTTER_RIGHT_LAYER) $(CUTTER_RIGHT)
+	@python3 $(CUTTER_SCRIPT) gen $< -l $(CUTTER_LEFT_LAYER) $(CUTTER_LEFT)
+	@python3 $(CUTTER_SCRIPT) gen $< -l $(CUTTER_RIGHT_LAYER) $(CUTTER_RIGHT)
+
+$(STEP_LEFT) $(STEP_RIGHT) &: $(STEP) $(CUTTER_LEFT) $(CUTTER_RIGHT) $(CUTTER_SCRIPT)
+	@mkdir -p $(dir $@)
+	@freecadcmd $(CUTTER_SCRIPT) cut $(STEP) $(CUTTER_LEFT) $(STEP_LEFT) 
 
 
 ###########
