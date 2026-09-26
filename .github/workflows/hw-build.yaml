@@ -19,11 +19,14 @@ jobs:
       - name: Build Hardware Package
         run: nix build .#hw -L
 
+      - name: Parse Stats
+        run: nix run .#parse-kicad-results -- stats result/share/alidade/stats.json >> $GITHUB_STEP_SUMMARY
+
       - name: Parse ERC Results
-        run: nix run .#parse-kicad-results -- erc result/share/alidade/erc.json $GITHUB_STEP_SUMMARY
+        run: nix run .#parse-kicad-results -- erc result/share/alidade/erc.json >> $GITHUB_STEP_SUMMARY
 
       - name: Parse DRC Results
-        run: nix run .#parse-kicad-results -- drc result/share/alidade/drc.json $GITHUB_STEP_SUMMARY --no-fatal-errors
+        run: nix run .#parse-kicad-results -- drc --no-fatal-errors result/share/alidade/drc.json >> $GITHUB_STEP_SUMMARY 
 
       - name: Gather Outputs
         run: tar -czf alidade-hw-pkg.tar.gz -C result .
