@@ -515,7 +515,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "schematics/pmic.kicad_sch"
+		(property "Sheetfile" "pmic.kicad_sch"
 			(at 194.31 207.5946 0)
 			(effects
 				(font
@@ -677,7 +677,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "schematics/hid.kicad_sch"
+		(property "Sheetfile" "hid.kicad_sch"
 			(at 194.31 170.7646 0)
 			(effects
 				(font
@@ -1079,7 +1079,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "schematics/mcu.kicad_sch"
+		(property "Sheetfile" "mcu.kicad_sch"
 			(at 127 207.5946 0)
 			(effects
 				(font
