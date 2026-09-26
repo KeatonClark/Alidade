@@ -3,7 +3,9 @@ name: Build Hardware
 on:
   push:
     branches: ["**"]
-  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build:
