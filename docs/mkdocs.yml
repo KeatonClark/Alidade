@@ -18,9 +18,7 @@ extra_javascript:
   - https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js
   - https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js
   - kicanvas/kicanvas.js
-  - javascripts/bom-table.js
-  - javascripts/erc-table.js
-  - javascripts/drc-table.js
+  - javascripts/kicad-results.js
   - javascripts/fullscreen-container.js
 
 theme:
@@ -43,4 +41,3 @@ nav:
   - Hardware:
     - Schematic: Schematic.md
     - Layout: Layout.md
-    - Bom: Bom.md

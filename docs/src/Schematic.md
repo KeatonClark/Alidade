@@ -1,4 +1,4 @@
-# Schematic
+## Schematic
 <fullscreen-container>
     <kicanvas-embed controls="full" theme="gruvbox" controlslist="nodownload">
         <kicanvas-source src="/alidade/alidade-hw/sch/alidade.kicad_sch"></kicanvas-source>
@@ -8,5 +8,8 @@
     </kicanvas-embed>
 </fullscreen-container>
 
-# ERC
-<erc-table data-src="/alidade/alidade-hw/erc/alidade-erc.csv"></erc-table>
+## BOM
+<bom-table data-src="/alidade/alidade-hw/sch/bom.csv"></bom-table>
+
+## ERC
+<erc-table data-src="/alidade/alidade-hw/sch/erc.json"></erc-table>

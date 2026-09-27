@@ -27,7 +27,7 @@
 }
 
 .tabulator .tabulator-row:hover {
-    background-color: var(--md-accent-fg-color);
+    background-color: var(--md-accent-fg-color) !important;
 }
 
 .tabulator .tabulator-cell {
