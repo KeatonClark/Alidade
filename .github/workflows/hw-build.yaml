@@ -3,7 +3,9 @@ name: Build Hardware
 on:
   push:
     branches: ["**"]
-  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -17,11 +19,14 @@ jobs:
       - name: Build Hardware Package
         run: nix build .#hw -L
 
-      - name: Parse ERC Results
-        run: python3 .github/scripts/parse_erc.py result/share/alidade/erc/alidade-erc.csv
+      - name: Parse Stats
+        run: nix run .#parse-kicad-results -- stats result/share/alidade/pcb/stats.json >> $GITHUB_STEP_SUMMARY
 
-#      - name: Parse DRC Results
-#        run: python3 .github/scripts/parse_drc.py result/share/alidade/drc/alidade-drc.csv
+      - name: Parse ERC Results
+        run: nix run .#parse-kicad-results -- erc result/share/alidade/sch/erc.json >> $GITHUB_STEP_SUMMARY
+
+      - name: Parse DRC Results
+        run: nix run .#parse-kicad-results -- drc --no-fatal-errors result/share/alidade/pcb/drc.json >> $GITHUB_STEP_SUMMARY 
 
       - name: Gather Outputs
         run: tar -czf alidade-hw-pkg.tar.gz -C result .

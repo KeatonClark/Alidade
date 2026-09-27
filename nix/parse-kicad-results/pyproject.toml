@@ -1,0 +1,10 @@
+[project]
+name = "parse-kicad-results"
+version = "0.1.0"
+
+[project.scripts]
+parse-kicad-results = "parse_kicad_results.main:cli"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

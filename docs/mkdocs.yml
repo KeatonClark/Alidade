@@ -10,13 +10,16 @@ plugins:
       paths: 
         - source: !ENV ALIDADE_HW
           destination: alidade-hw
+        - source: !ENV KICANVAS
+          destination: kicanvas
   - search
 
 extra_javascript:
   - https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js
-  - javascripts/bom-table.js
-  - javascripts/erc-table.js
-  - javascripts/drc-table.js
+  - https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js
+  - kicanvas/kicanvas.js
+  - javascripts/kicad-results.js
+  - javascripts/fullscreen-container.js
 
 theme:
   name: material
@@ -30,6 +33,7 @@ extra_css:
   - https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css
   - stylesheets/gruvbox.css
   - stylesheets/tabulator.css
+  - stylesheets/model-viewer.css
 
 
 nav:
@@ -37,5 +41,3 @@ nav:
   - Hardware:
     - Schematic: Schematic.md
     - Layout: Layout.md
-    - Bom: Bom.md
-    - Datasheets: Datasheets.md
