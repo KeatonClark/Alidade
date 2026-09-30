@@ -13857,6 +13857,7 @@
 	(symbol
 		(lib_id "Alidade:SW_Push")
 		(at 248.92 97.79 0)
+		(mirror y)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -19553,6 +19554,7 @@
 	(symbol
 		(lib_id "Alidade:SW_Push")
 		(at 248.92 82.55 0)
+		(mirror y)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
